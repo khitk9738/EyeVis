@@ -1,21 +1,5 @@
 package org.tensorflow.demo;
 
-/*
- * Copyright 2017 The TensorFlow Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import android.app.Fragment;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -34,17 +18,14 @@ import java.io.IOException;
 import java.util.List;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R; // Explicit import needed for internal Google builds.
-
+import org.tensorflow.demo.R; 
 public class LegacyCameraConnectionFragment extends Fragment {
   private Camera camera;
   private static final Logger LOGGER = new Logger();
   private Camera.PreviewCallback imageListener;
   private Size desiredSize;
 
-  /**
-   * The layout identifier to inflate for this Fragment.
-   */
+  
   private int layout;
 
   public LegacyCameraConnectionFragment(
@@ -54,9 +35,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     this.desiredSize = desiredSize;
   }
 
-  /**
-   * Conversion from screen rotation to JPEG orientation.
-   */
+  
   private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
   static {
@@ -66,10 +45,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     ORIENTATIONS.append(Surface.ROTATION_270, 180);
   }
 
-  /**
-   * {@link android.view.TextureView.SurfaceTextureListener} handles several lifecycle events on a
-   * {@link TextureView}.
-   */
+  
   private final TextureView.SurfaceTextureListener surfaceTextureListener =
       new TextureView.SurfaceTextureListener() {
         @Override
@@ -122,14 +98,9 @@ public class LegacyCameraConnectionFragment extends Fragment {
         public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
       };
 
-  /**
-   * An {@link AutoFitTextureView} for camera preview.
-   */
   private AutoFitTextureView textureView;
 
-  /**
-   * An additional thread for running tasks that shouldn't block the UI.
-   */
+  
   private HandlerThread backgroundThread;
 
   @Override
@@ -152,11 +123,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
   public void onResume() {
     super.onResume();
     startBackgroundThread();
-    // When the screen is turned off and turned back on, the SurfaceTexture is already
-    // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-    // a camera and start preview from here (otherwise, we wait until the surface is ready in
-    // the SurfaceTextureListener).
-
+    
     if (textureView.isAvailable()) {
       camera.startPreview();
     } else {
@@ -171,17 +138,12 @@ public class LegacyCameraConnectionFragment extends Fragment {
     super.onPause();
   }
 
-  /**
-   * Starts a background thread and its {@link Handler}.
-   */
+  
   private void startBackgroundThread() {
     backgroundThread = new HandlerThread("CameraBackground");
     backgroundThread.start();
   }
 
-  /**
-   * Stops the background thread and its {@link Handler}.
-   */
   private void stopBackgroundThread() {
     backgroundThread.quitSafely();
     try {

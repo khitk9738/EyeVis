@@ -1,19 +1,3 @@
-/*
- * Copyright 2016 The TensorFlow Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.tensorflow.demo;
 
 import android.Manifest;
@@ -46,7 +30,7 @@ import android.widget.Toast;
 import java.nio.ByteBuffer;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R; // Explicit import needed for internal Google builds.
+import org.tensorflow.demo.R; 
 
 public abstract class CameraActivity extends Activity
     implements OnImageAvailableListener, Camera.PreviewCallback {
@@ -77,14 +61,7 @@ public abstract class CameraActivity extends Activity
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
     super.onCreate(null);
-    /*b=(Button) findViewById(R.id.button);
-    b.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Toast.makeText(getApplicationContext(),"hoorey",Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(CameraActivity.this,MainActivity.class));
-      }
-    });*/
+    
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     setContentView(R.layout.activity_camera);
@@ -111,9 +88,7 @@ public abstract class CameraActivity extends Activity
     return yuvBytes[0];
   }
 
-  /**
-   * Callback for android.hardware.Camera API
-   */
+  
   @Override
   public void onPreviewFrame(final byte[] bytes, final Camera camera) {
     if (isProcessingFrame) {
@@ -122,7 +97,7 @@ public abstract class CameraActivity extends Activity
     }
 
     try {
-      // Initialize the storage bitmaps once when the resolution is known.
+      
       if (rgbBytes == null) {
         Camera.Size previewSize = camera.getParameters().getPreviewSize();
         previewHeight = previewSize.height;
@@ -159,12 +134,10 @@ public abstract class CameraActivity extends Activity
     processImage();
   }
 
-  /**
-   * Callback for Camera2 API
-   */
+  
   @Override
   public void onImageAvailable(final ImageReader reader) {
-    //We need wait until we have some size from onPreviewSizeChosen
+   
     if (previewWidth == 0 || previewHeight == 0) {
       return;
     }
@@ -314,14 +287,13 @@ public abstract class CameraActivity extends Activity
     }
   }
 
-  // Returns true if the device supports the required hardware level, or better.
   private boolean isHardwareLevelSupported(
       CameraCharacteristics characteristics, int requiredLevel) {
     int deviceLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
     if (deviceLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
       return requiredLevel == deviceLevel;
     }
-    // deviceLevel is not LEGACY, can use numerical sort
+   
     return requiredLevel <= deviceLevel;
   }
 
@@ -331,7 +303,6 @@ public abstract class CameraActivity extends Activity
       for (final String cameraId : manager.getCameraIdList()) {
         final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-        // We don't use a front facing camera in this sample.
         final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
         if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
           continue;
@@ -344,9 +315,6 @@ public abstract class CameraActivity extends Activity
           continue;
         }
 
-        // Fallback to camera1 API for internal cameras that don't have full support.
-        // This should help with legacy situations where using the camera2 API causes
-        // distorted or otherwise broken previews.
         useCamera2API = (facing == CameraCharacteristics.LENS_FACING_EXTERNAL)
             || isHardwareLevelSupported(characteristics, 
                                         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
@@ -393,8 +361,7 @@ public abstract class CameraActivity extends Activity
   }
 
   protected void fillBytes(final Plane[] planes, final byte[][] yuvBytes) {
-    // Because of the variable row stride it's not possible to know in
-    // advance the actual necessary dimensions of the yuv planes.
+    
     for (int i = 0; i < planes.length; ++i) {
       final ByteBuffer buffer = planes[i].getBuffer();
       if (yuvBytes[i] == null) {

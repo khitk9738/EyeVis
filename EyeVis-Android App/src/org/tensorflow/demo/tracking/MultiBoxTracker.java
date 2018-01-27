@@ -1,17 +1,3 @@
-/* Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
 
 package org.tensorflow.demo.tracking;
 
@@ -36,26 +22,21 @@ import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 
-/**
- * A tracker wrapping ObjectTracker that also handles non-max suppression and matching existing
- * objects to new detections.
- */
+
 public class MultiBoxTracker {
   private final Logger logger = new Logger();
 
   private static final float TEXT_SIZE_DIP = 18;
 
-  // Maximum percentage of a box that can be overlapped by another box at detection time. Otherwise
-  // the lower scored box (new or old) will be removed.
+ 
   private static final float MAX_OVERLAP = 0.2f;
 
   private static final float MIN_SIZE = 16.0f;
 
-  // Allow replacement of the tracked box with new results if
-  // correlation has dropped below this level.
+ 
   private static final float MARGINAL_CORRELATION = 0.75f;
 
-  // Consider object to be lost if correlation falls below this threshold.
+ 
   private static final float MIN_CORRELATION = 0.3f;
 
   private static final int[] COLORS = {
@@ -227,7 +208,6 @@ public class MultiBoxTracker {
 
     objectTracker.nextFrame(frame, null, timestamp, null, true);
 
-    // Clean up any objects not worth tracking any more.
     final LinkedList<TrackedRecognition> copyList =
         new LinkedList<TrackedRecognition>(trackedObjects);
     for (final TrackedRecognition recognition : copyList) {
@@ -321,12 +301,10 @@ public class MultiBoxTracker {
 
     float maxIntersect = 0.0f;
 
-    // This is the current tracked object whose color we will take. If left null we'll take the
-    // first one from the color queue.
+   
     TrackedRecognition recogToReplace = null;
 
-    // Look for intersections that will be overridden by this object or an intersection that would
-    // prevent this one from being placed.
+
     for (final TrackedRecognition trackedRecognition : trackedObjects) {
       final RectF a = trackedRecognition.trackedObject.getTrackedPositionInPreviewFrame();
       final RectF b = potentialObject.getTrackedPositionInPreviewFrame();
@@ -337,21 +315,15 @@ public class MultiBoxTracker {
       final float totalArea = a.width() * a.height() + b.width() * b.height() - intersectArea;
       final float intersectOverUnion = intersectArea / totalArea;
 
-      // If there is an intersection with this currently tracked box above the maximum overlap
-      // percentage allowed, either the new recognition needs to be dismissed or the old
-      // recognition needs to be removed and possibly replaced with the new one.
       if (intersects && intersectOverUnion > MAX_OVERLAP) {
         if (potential.first < trackedRecognition.detectionConfidence
             && trackedRecognition.trackedObject.getCurrentCorrelation() > MARGINAL_CORRELATION) {
-          // If track for the existing object is still going strong and the detection score was
-          // good, reject this new object.
+       
           potentialObject.stopTracking();
           return;
         } else {
           removeList.add(trackedRecognition);
 
-          // Let the previously tracked object with max intersection amount donate its color to
-          // the new object.
           if (intersectOverUnion > maxIntersect) {
             maxIntersect = intersectOverUnion;
             recogToReplace = trackedRecognition;
@@ -360,15 +332,12 @@ public class MultiBoxTracker {
       }
     }
 
-    // If we're already tracking the max object and no intersections were found to bump off,
-    // pick the worst current tracked object to remove, if it's also worse than this candidate
-    // object.
+
     if (availableColors.isEmpty() && removeList.isEmpty()) {
       for (final TrackedRecognition candidate : trackedObjects) {
         if (candidate.detectionConfidence < potential.first) {
           if (recogToReplace == null
               || candidate.detectionConfidence < recogToReplace.detectionConfidence) {
-            // Save it so that we use this color for the new object.
             recogToReplace = candidate;
           }
         }
@@ -381,7 +350,6 @@ public class MultiBoxTracker {
       }
     }
 
-    // Remove everything that got intersected.
     for (final TrackedRecognition trackedRecognition : removeList) {
       logger.v(
           "Removing tracked object %s with detection confidence %.2f, correlation %.2f",
@@ -401,7 +369,6 @@ public class MultiBoxTracker {
       return;
     }
 
-    // Finally safe to say we can track this object.
     logger.v(
         "Tracking object %s (%s) with detection confidence %.2f at position %s",
         potentialObject,
@@ -413,7 +380,6 @@ public class MultiBoxTracker {
     trackedRecognition.trackedObject = potentialObject;
     trackedRecognition.title = potential.second.getTitle();
 
-    // Use the color from a replaced object before taking one from the color queue.
     trackedRecognition.color =
         recogToReplace != null ? recogToReplace.color : availableColors.poll();
     trackedObjects.add(trackedRecognition);

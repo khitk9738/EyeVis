@@ -1,17 +1,3 @@
-/* Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
 
 package org.tensorflow.demo.tracking;
 
@@ -32,21 +18,7 @@ import javax.microedition.khronos.opengles.GL10;
 import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.env.Size;
 
-/**
- * True object detector/tracker class that tracks objects across consecutive preview frames.
- * It provides a simplified Java interface to the analogous native object defined by
- * jni/client_vision/tracking/object_tracker.*.
- *
- * Currently, the ObjectTracker is a singleton due to native code restrictions, and so must
- * be allocated by ObjectTracker.getInstance(). In addition, release() should be called
- * as soon as the ObjectTracker is no longer needed, and before a new one is created.
- *
- * nextFrame() should be called as new frames become available, preferably as often as possible.
- *
- * After allocation, new TrackedObjects may be instantiated via trackObject(). TrackedObjects
- * are associated with the ObjectTracker that created them, and are only valid while that
- * ObjectTracker still exists.
- */
+
 public class ObjectTracker {
   private static final Logger LOGGER = new Logger();
 
@@ -63,17 +35,10 @@ public class ObjectTracker {
 
   private static final boolean DRAW_TEXT = false;
 
-  /**
-   * How many history points to keep track of and draw in the red history line.
-   */
+ 
   private static final int MAX_DEBUG_HISTORY_SIZE = 30;
 
-  /**
-   * How many frames of optical flow deltas to record.
-   * TODO(andrewharp): Push this down to the native level so it can be polled
-   * efficiently into a an array for upload, instead of keeping a duplicate
-   * copy in Java.
-   */
+  
   private static final int MAX_FRAME_HISTORY_SIZE = 200;
 
   private static final int DOWNSAMPLE_FACTOR = 2;
@@ -107,11 +72,7 @@ public class ObjectTracker {
     }
   }
 
-  /**
-   * A simple class that records keypoint information, which includes
-   * local location, score and type. This will be used in calculating
-   * FrameChange.
-   */
+  
   public static class Keypoint {
     public final float x;
     public final float y;
@@ -137,11 +98,7 @@ public class ObjectTracker {
     }
   }
 
-  /**
-   * A simple class that could calculate Keypoint delta.
-   * This class will be used in calculating frame translation delta
-   * for optical flow.
-   */
+  
   public static class PointChange {
     public final Keypoint keypointA;
     public final Keypoint keypointB;
@@ -166,7 +123,6 @@ public class ObjectTracker {
     }
   }
 
-  /** A class that records a timestamped frame translation delta for optical flow. */
   public static class FrameChange {
     public static final int KEYPOINT_STEP = 7;
 
@@ -249,8 +205,7 @@ public class ObjectTracker {
   }
 
   protected void init() {
-    // The native tracker never sees the full frame, so pre-scale dimensions
-    // by the downsample factor.
+    
     initNative(frameWidth / DOWNSAMPLE_FACTOR, frameHeight / DOWNSAMPLE_FACTOR, alwaysTrack);
   }
 
@@ -277,7 +232,6 @@ public class ObjectTracker {
       downsampledTimestamp = timestamp;
     }
 
-    // Do Lucas Kanade using the fullframe initializer.
     nextFrameNative(downsampledFrame, uvData, timestamp, transformationMatrix);
 
     timestampedDeltas.add(new TimestampedDeltas(timestamp, getKeypointsPacked(DOWNSAMPLE_FACTOR)));
@@ -316,13 +270,12 @@ public class ObjectTracker {
     p.setColor(Color.RED);
     p.setStrokeWidth(2.0f);
 
-    // Draw the center circle.
+  
     p.setColor(Color.GREEN);
     canvas.drawCircle(startX, startY, 3.0f, p);
 
     p.setColor(Color.RED);
 
-    // Iterate through in backwards order.
     synchronized (debugHistory) {
       final int numPoints = debugHistory.size();
       float lastX = startX;
@@ -478,14 +431,6 @@ public class ObjectTracker {
         downsampledFrameRect.bottom * DOWNSAMPLE_FACTOR);
   }
 
-  /**
-   * A TrackedObject represents a native TrackedObject, and provides access to the
-   * relevant native tracking information available after every frame update. They may
-   * be safely passed around and accessed externally, but will become invalid after
-   * stopTracking() is called or the related creating ObjectTracker is deactivated.
-   *
-   * @author andrewharp@google.com (Andrew Harp)
-   */
   public class TrackedObject {
     private final String id;
 
@@ -612,9 +557,6 @@ public class ObjectTracker {
     return new TrackedObject(position, lastTimestamp, frameData);
   }
 
-  /** ********************* NATIVE CODE ************************************ */
-
-  /** This will contain an opaque pointer to the native ObjectTracker */
   private long nativeObjectTracker;
 
   private native void initNative(int imageWidth, int imageHeight, boolean alwaysTrack);
