@@ -390,7 +390,7 @@ def visualize_boxes_and_labels_on_image_array(image,
           display_str = '{}: {}%'.format(
               class_name,
               int(100*scores[i]))
-          print(class_name)
+          #print(class_name)
         else:
           display_str = 'score: {}%'.format(int(100 * scores[i]))
         box_to_display_str_map[box].append(display_str)
