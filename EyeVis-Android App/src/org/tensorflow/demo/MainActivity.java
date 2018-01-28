@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             t1.setSpeechRate(2.00f);
-            if((stringBuilder.toString()).equals(""))
+            if((stringBuilder==null))
             {
                 press_cnt=0;
                 t1.stop();
@@ -187,9 +187,32 @@ public class MainActivity extends AppCompatActivity {
             t1.shutdown();
             startActivity((new Intent(MainActivity.this,MainActivity.class)).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
             finish();
-           
+           // cameraSource.start(cameraView.getHolder());
+            //flag=true;
+
         }
-        
+        /*if(!cnt  && !times){
+            cameraSource.stop();
+            cnt=true;
+            times=false;
+
+
+            Toast.makeText(Ma)
+        }
+
+        else if(cnt && !times)
+        {
+            times=true;
+            cnt=true;
+            t1.speak(stringBuilder.toString(),TextToSpeech.QUEUE_ADD,null,null);
+            Toast.makeText(MainActivity.this,stringBuilder.toString(),Toast.LENGTH_SHORT).show();
+        }
+        else {
+            cnt=false;
+            times=false;
+            t1.stop();
+            startActivity(new Intent(MainActivity.this,MainActivity.class));
+        }*/
         return super.dispatchTouchEvent(ev);
     }
     @Override
@@ -213,4 +236,10 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+    protected void onRestart() {
+        super.onRestart();
+        Intent i=new Intent(MainActivity.this,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+    }
+
 }

@@ -1,4 +1,3 @@
-
 package org.tensorflow.demo.tracking;
 
 import android.content.Context;
@@ -22,21 +21,15 @@ import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 
-
 public class MultiBoxTracker {
   private final Logger logger = new Logger();
 
   private static final float TEXT_SIZE_DIP = 18;
-
- 
-  private static final float MAX_OVERLAP = 0.2f;
+private static final float MAX_OVERLAP = 0.2f;
 
   private static final float MIN_SIZE = 16.0f;
+private static final float MARGINAL_CORRELATION = 0.75f;
 
- 
-  private static final float MARGINAL_CORRELATION = 0.75f;
-
- 
   private static final float MIN_CORRELATION = 0.3f;
 
   private static final int[] COLORS = {
@@ -119,7 +112,6 @@ public class MultiBoxTracker {
       return;
     }
 
-    // Draw correlations.
     for (final TrackedRecognition recognition : trackedObjects) {
       final ObjectTracker.TrackedObject trackedObject = recognition.trackedObject;
 
@@ -197,7 +189,7 @@ public class MultiBoxTracker {
         String message =
             "Object tracking support not found. "
                 + "See tensorflow/examples/android/README.md for details.";
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         logger.e(message);
       }
     }
@@ -301,10 +293,7 @@ public class MultiBoxTracker {
 
     float maxIntersect = 0.0f;
 
-   
     TrackedRecognition recogToReplace = null;
-
-
     for (final TrackedRecognition trackedRecognition : trackedObjects) {
       final RectF a = trackedRecognition.trackedObject.getTrackedPositionInPreviewFrame();
       final RectF b = potentialObject.getTrackedPositionInPreviewFrame();
@@ -331,7 +320,6 @@ public class MultiBoxTracker {
         }
       }
     }
-
 
     if (availableColors.isEmpty() && removeList.isEmpty()) {
       for (final TrackedRecognition candidate : trackedObjects) {

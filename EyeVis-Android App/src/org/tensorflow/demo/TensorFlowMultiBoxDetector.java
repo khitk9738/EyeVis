@@ -1,3 +1,17 @@
+/* Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
 
 package org.tensorflow.demo;
 
@@ -20,17 +34,17 @@ import org.tensorflow.Operation;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.demo.env.Logger;
 
-
+/**
+ * A detector for general purpose object detection as described in Scalable Object Detection using
+ * Deep Neural Networks (https://arxiv.org/abs/1312.2249).
+ */
 public class TensorFlowMultiBoxDetector implements Classifier {
   private static final Logger LOGGER = new Logger();
-
   private static final int MAX_RESULTS = Integer.MAX_VALUE;
-
   private String inputName;
   private int inputSize;
   private int imageMean;
   private float imageStd;
-
   private int[] intValues;
   private float[] floatValues;
   private float[] outputLocations;
@@ -44,7 +58,6 @@ public class TensorFlowMultiBoxDetector implements Classifier {
 
   private float[] boxPriors;
 
-  
   public static Classifier create(
       final AssetManager assetManager,
       final String modelFilename,
@@ -61,7 +74,10 @@ public class TensorFlowMultiBoxDetector implements Classifier {
     final Graph g = d.inferenceInterface.graph();
 
     d.inputName = inputName;
-    
+    // The inputName node has a shape of [N, H, W, C], where
+    // N is the batch size
+    // H = W are the height and width
+    // C is the number of channels (3 for our purposes - RGB)
     final Operation inputOp = g.operation(inputName);
     if (inputOp == null) {
       throw new RuntimeException("Failed to find input Node '" + inputName + "'");
@@ -69,7 +85,6 @@ public class TensorFlowMultiBoxDetector implements Classifier {
     d.inputSize = (int) inputOp.output(0).shape().size(1);
     d.imageMean = imageMean;
     d.imageStd = imageStd;
-   
     final Operation outputOp = g.operation(outputScoresName);
     if (outputOp == null) {
       throw new RuntimeException("Failed to find output Node '" + outputScoresName + "'");
@@ -83,8 +98,6 @@ public class TensorFlowMultiBoxDetector implements Classifier {
     } catch (final IOException e) {
       throw new RuntimeException("Error initializing box priors from " + locationFilename);
     }
-
-    
     d.outputNames = new String[] {outputLocationsName, outputScoresName};
     d.intValues = new int[d.inputSize * d.inputSize];
     d.floatValues = new float[d.inputSize * d.inputSize * 3];
@@ -118,7 +131,6 @@ public class TensorFlowMultiBoxDetector implements Classifier {
           final float number = Float.parseFloat(token);
           boxPriors[priorIndex++] = number;
         } catch (final NumberFormatException e) {
-          // Silently ignore.
         }
       }
     }
@@ -161,11 +173,9 @@ public class TensorFlowMultiBoxDetector implements Classifier {
 
   @Override
   public List<Recognition> recognizeImage(final Bitmap bitmap) {
-    
     Trace.beginSection("recognizeImage");
 
     Trace.beginSection("preprocessBitmap");
-    
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
     for (int i = 0; i < intValues.length; ++i) {
@@ -173,16 +183,13 @@ public class TensorFlowMultiBoxDetector implements Classifier {
       floatValues[i * 3 + 1] = (((intValues[i] >> 8) & 0xFF) - imageMean) / imageStd;
       floatValues[i * 3 + 2] = ((intValues[i] & 0xFF) - imageMean) / imageStd;
     }
-    Trace.endSection(); 
-	
+    Trace.endSection();
     Trace.beginSection("feed");
     inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
     Trace.endSection();
-
     Trace.beginSection("run");
     inferenceInterface.run(outputNames, logStats);
     Trace.endSection();
-
     Trace.beginSection("fetch");
     final float[] outputScoresEncoding = new float[numLocations];
     final float[] outputLocationsEncoding = new float[numLocations * 4];
@@ -192,14 +199,13 @@ public class TensorFlowMultiBoxDetector implements Classifier {
 
     outputLocations = decodeLocationsEncoding(outputLocationsEncoding);
     outputScores = decodeScoresEncoding(outputScoresEncoding);
-
     final PriorityQueue<Recognition> pq =
         new PriorityQueue<Recognition>(
             1,
             new Comparator<Recognition>() {
               @Override
               public int compare(final Recognition lhs, final Recognition rhs) {
-                
+                // Intentionally reversed to put high confidence at the head of the queue.
                 return Float.compare(rhs.getConfidence(), lhs.getConfidence());
               }
             });

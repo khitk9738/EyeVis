@@ -1,4 +1,3 @@
-
 package org.tensorflow.demo;
 
 import android.util.Log;
@@ -10,7 +9,6 @@ import java.util.Deque;
 import java.util.List;
 
 public class RecognizeCommands {
-
   private List<String> labels = new ArrayList<String>();
   private long averageWindowDurationMs;
   private float detectionThreshold;
@@ -18,7 +16,6 @@ public class RecognizeCommands {
   private int minimumCount;
   private long minimumTimeBetweenSamplesMs;
 
- 
   private Deque<Pair<Long, float[]>> previousResults = new ArrayDeque<Pair<Long, float[]>>();
   private String previousTopLabel;
   private int labelsCount;
@@ -98,7 +95,6 @@ public class RecognizeCommands {
     }
 
     final int howManyResults = previousResults.size();
-    
     if (howManyResults > 1) {
       final long timeSinceMostRecent = currentTimeMS - previousResults.getLast().first;
       if (timeSinceMostRecent < minimumTimeBetweenSamplesMs) {
@@ -108,7 +104,6 @@ public class RecognizeCommands {
 
     previousResults.addLast(new Pair<Long, float[]>(currentTimeMS, currentResults));
 
-   
     final long timeLimit = currentTimeMS - averageWindowDurationMs;
     while (previousResults.getFirst().first < timeLimit) {
       previousResults.removeFirst();
@@ -121,7 +116,6 @@ public class RecognizeCommands {
       Log.v("RecognizeResult", "Too few results");
       return new RecognitionResult(previousTopLabel, 0.0f, false);
     }
-
     float[] averageScores = new float[labelsCount];
     for (Pair<Long, float[]> previousResult : previousResults) {
       final float[] scoresTensor = previousResult.second;
@@ -141,7 +135,6 @@ public class RecognizeCommands {
     final int currentTopIndex = sortedAverageScores[0].index;
     final String currentTopLabel = labels.get(currentTopIndex);
     final float currentTopScore = sortedAverageScores[0].score;
- 
     long timeSinceLastTop;
     if (previousTopLabel.equals(SILENCE_LABEL) || (previousTopLabelTime == Long.MIN_VALUE)) {
       timeSinceLastTop = Long.MAX_VALUE;

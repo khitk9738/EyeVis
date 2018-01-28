@@ -1,22 +1,15 @@
-
 package org.tensorflow.demo;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import java.util.List;
 
-
 public interface Classifier {
-  
   public class Recognition {
-   
     private final String id;
-
     private final String title;
-
     private final Float confidence;
 
-    
     private RectF location;
 
     public Recognition(

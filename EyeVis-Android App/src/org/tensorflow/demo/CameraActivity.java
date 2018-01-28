@@ -24,6 +24,7 @@ import android.util.Size;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
@@ -61,8 +62,17 @@ public abstract class CameraActivity extends Activity
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
     super.onCreate(null);
-    
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    /*b=(Button) findViewById(R.id.button);
+    b.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Toast.makeText(getApplicationContext(),"hoorey",Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(CameraActivity.this,MainActivity.class));
+      }
+    });*/
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 
     setContentView(R.layout.activity_camera);
 
@@ -88,7 +98,7 @@ public abstract class CameraActivity extends Activity
     return yuvBytes[0];
   }
 
-  
+ 
   @Override
   public void onPreviewFrame(final byte[] bytes, final Camera camera) {
     if (isProcessingFrame) {
@@ -97,7 +107,6 @@ public abstract class CameraActivity extends Activity
     }
 
     try {
-      
       if (rgbBytes == null) {
         Camera.Size previewSize = camera.getParameters().getPreviewSize();
         previewHeight = previewSize.height;
@@ -134,10 +143,9 @@ public abstract class CameraActivity extends Activity
     processImage();
   }
 
-  
+
   @Override
   public void onImageAvailable(final ImageReader reader) {
-   
     if (previewWidth == 0 || previewHeight == 0) {
       return;
     }
@@ -287,13 +295,14 @@ public abstract class CameraActivity extends Activity
     }
   }
 
+  // Returns true if the device supports the required hardware level, or better.
   private boolean isHardwareLevelSupported(
       CameraCharacteristics characteristics, int requiredLevel) {
     int deviceLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
     if (deviceLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
       return requiredLevel == deviceLevel;
     }
-   
+
     return requiredLevel <= deviceLevel;
   }
 
@@ -302,6 +311,7 @@ public abstract class CameraActivity extends Activity
     try {
       for (final String cameraId : manager.getCameraIdList()) {
         final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+
 
         final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
         if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
@@ -314,6 +324,7 @@ public abstract class CameraActivity extends Activity
         if (map == null) {
           continue;
         }
+
 
         useCamera2API = (facing == CameraCharacteristics.LENS_FACING_EXTERNAL)
             || isHardwareLevelSupported(characteristics, 

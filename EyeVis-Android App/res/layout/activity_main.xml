@@ -4,10 +4,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="16dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="16dp"
     tools:context="org.tensorflow.demo.MainActivity">
 
     <SurfaceView
@@ -22,6 +18,7 @@
         android:layout_alignParentBottom="true"
         android:textColor="@android:color/white"
         android:textSize="20sp"
+        android:textIsSelectable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </RelativeLayout>

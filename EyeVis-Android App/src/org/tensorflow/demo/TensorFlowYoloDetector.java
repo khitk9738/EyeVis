@@ -15,13 +15,11 @@ import org.tensorflow.demo.env.SplitTimer;
 public class TensorFlowYoloDetector implements Classifier {
   private static final Logger LOGGER = new Logger();
 
- 
   private static final int MAX_RESULTS = 5;
 
   private static final int NUM_CLASSES = 20;
 
   private static final int NUM_BOXES_PER_BLOCK = 5;
-
   private static final double[] ANCHORS = {
     1.08, 1.19,
     3.42, 4.41,
@@ -53,11 +51,9 @@ public class TensorFlowYoloDetector implements Classifier {
     "tvmonitor"
   };
 
-  // Config values.
   private String inputName;
   private int inputSize;
 
-  // Pre-allocated buffers.
   private int[] intValues;
   private float[] floatValues;
   private String[] outputNames;
@@ -114,11 +110,9 @@ public class TensorFlowYoloDetector implements Classifier {
   public List<Recognition> recognizeImage(final Bitmap bitmap) {
     final SplitTimer timer = new SplitTimer("recognizeImage");
 
-   
     Trace.beginSection("recognizeImage");
 
     Trace.beginSection("preprocessBitmap");
-   
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
     for (int i = 0; i < intValues.length; ++i) {
@@ -126,21 +120,17 @@ public class TensorFlowYoloDetector implements Classifier {
       floatValues[i * 3 + 1] = ((intValues[i] >> 8) & 0xFF) / 255.0f;
       floatValues[i * 3 + 2] = (intValues[i] & 0xFF) / 255.0f;
     }
-    Trace.endSection(); 
-	
+    Trace.endSection();
     Trace.beginSection("feed");
     inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
     Trace.endSection();
 
     timer.endSplit("ready for inference");
-
-    
     Trace.beginSection("run");
     inferenceInterface.run(outputNames, logStats);
     Trace.endSection();
 
     timer.endSplit("ran inference");
-
     Trace.beginSection("fetch");
     final int gridWidth = bitmap.getWidth() / blockSize;
     final int gridHeight = bitmap.getHeight() / blockSize;
@@ -155,6 +145,7 @@ public class TensorFlowYoloDetector implements Classifier {
             new Comparator<Recognition>() {
               @Override
               public int compare(final Recognition lhs, final Recognition rhs) {
+                // Intentionally reversed to put high confidence at the head of the queue.
                 return Float.compare(rhs.getConfidence(), lhs.getConfidence());
               }
             });
@@ -212,7 +203,7 @@ public class TensorFlowYoloDetector implements Classifier {
     for (int i = 0; i < Math.min(pq.size(), MAX_RESULTS); ++i) {
       recognitions.add(pq.poll());
     }
-    Trace.endSection(); 
+    Trace.endSection(); // "recognizeImage"
 
     timer.endSplit("processed results");
 

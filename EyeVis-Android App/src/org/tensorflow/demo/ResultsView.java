@@ -1,4 +1,3 @@
-
 package org.tensorflow.demo;
 
 import org.tensorflow.demo.Classifier.Recognition;

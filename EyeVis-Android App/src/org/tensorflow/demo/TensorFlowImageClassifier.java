@@ -18,7 +18,6 @@ import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 public class TensorFlowImageClassifier implements Classifier {
   private static final String TAG = "TensorFlowImageClassifier";
 
-  
   private static final int MAX_RESULTS = 3;
   private static final float THRESHOLD = 0.1f;
 
@@ -40,7 +39,6 @@ public class TensorFlowImageClassifier implements Classifier {
 
   private TensorFlowImageClassifier() {}
 
-  
   public static Classifier create(
       AssetManager assetManager,
       String modelFilename,
@@ -53,10 +51,8 @@ public class TensorFlowImageClassifier implements Classifier {
     TensorFlowImageClassifier c = new TensorFlowImageClassifier();
     c.inputName = inputName;
     c.outputName = outputName;
-
-    
     String actualFilename = labelFilename.split("file:///android_asset/")[1];
-    Log.i(TAG, "Reading labels from: " + actualFilename);
+    //Log.i(TAG, "Reading labels from: " + actualFilename);
     BufferedReader br = null;
     try {
       br = new BufferedReader(new InputStreamReader(assetManager.open(actualFilename)));
@@ -70,17 +66,12 @@ public class TensorFlowImageClassifier implements Classifier {
     }
 
     c.inferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilename);
-
     final Operation operation = c.inferenceInterface.graphOperation(outputName);
     final int numClasses = (int) operation.output(0).shape().size(1);
-    Log.i(TAG, "Read " + c.labels.size() + " labels, output layer size is " + numClasses);
-
-   
+    //Log.i(TAG, "Read " + c.labels.size() + " labels, output layer size is " + numClasses);
     c.inputSize = inputSize;
     c.imageMean = imageMean;
     c.imageStd = imageStd;
-
-
     c.outputNames = new String[] {outputName};
     c.intValues = new int[inputSize * inputSize];
     c.floatValues = new float[inputSize * inputSize * 3];
@@ -91,11 +82,9 @@ public class TensorFlowImageClassifier implements Classifier {
 
   @Override
   public List<Recognition> recognizeImage(final Bitmap bitmap) {
-    
     Trace.beginSection("recognizeImage");
 
     Trace.beginSection("preprocessBitmap");
-
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
     for (int i = 0; i < intValues.length; ++i) {
       final int val = intValues[i];
@@ -104,28 +93,22 @@ public class TensorFlowImageClassifier implements Classifier {
       floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
     }
     Trace.endSection();
-
-   
     Trace.beginSection("feed");
     inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
     Trace.endSection();
-
-   
     Trace.beginSection("run");
     inferenceInterface.run(outputNames, logStats);
     Trace.endSection();
-
     Trace.beginSection("fetch");
     inferenceInterface.fetch(outputName, outputs);
     Trace.endSection();
-
     PriorityQueue<Recognition> pq =
         new PriorityQueue<Recognition>(
             3,
             new Comparator<Recognition>() {
               @Override
               public int compare(Recognition lhs, Recognition rhs) {
-              
+
                 return Float.compare(rhs.getConfidence(), lhs.getConfidence());
               }
             });
@@ -141,7 +124,7 @@ public class TensorFlowImageClassifier implements Classifier {
     for (int i = 0; i < recognitionsSize; ++i) {
       recognitions.add(pq.poll());
     }
-    Trace.endSection(); 
+    Trace.endSection();
     return recognitions;
   }
 

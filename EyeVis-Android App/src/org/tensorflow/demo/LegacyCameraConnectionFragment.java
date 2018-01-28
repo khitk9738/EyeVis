@@ -19,13 +19,12 @@ import java.util.List;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.R; 
+
 public class LegacyCameraConnectionFragment extends Fragment {
   private Camera camera;
   private static final Logger LOGGER = new Logger();
   private Camera.PreviewCallback imageListener;
   private Size desiredSize;
-
-  
   private int layout;
 
   public LegacyCameraConnectionFragment(
@@ -35,7 +34,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     this.desiredSize = desiredSize;
   }
 
-  
+
   private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
   static {
@@ -44,8 +43,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
     ORIENTATIONS.append(Surface.ROTATION_180, 270);
     ORIENTATIONS.append(Surface.ROTATION_270, 180);
   }
-
-  
   private final TextureView.SurfaceTextureListener surfaceTextureListener =
       new TextureView.SurfaceTextureListener() {
         @Override
@@ -100,7 +97,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
 
   private AutoFitTextureView textureView;
 
-  
   private HandlerThread backgroundThread;
 
   @Override
@@ -123,7 +119,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
   public void onResume() {
     super.onResume();
     startBackgroundThread();
-    
     if (textureView.isAvailable()) {
       camera.startPreview();
     } else {
@@ -138,7 +133,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
     super.onPause();
   }
 
-  
   private void startBackgroundThread() {
     backgroundThread = new HandlerThread("CameraBackground");
     backgroundThread.start();
@@ -170,6 +164,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
       if (ci.facing == CameraInfo.CAMERA_FACING_BACK)
         return i;
     }
-    return -1; // No camera found
+    return -1; 
   }
 }

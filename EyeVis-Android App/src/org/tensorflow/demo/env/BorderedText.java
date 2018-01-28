@@ -1,5 +1,4 @@
 
-
 package org.tensorflow.demo.env;
 
 import android.graphics.Canvas;
@@ -17,7 +16,6 @@ public class BorderedText {
 
   private final float textSize;
 
-  
   public BorderedText(final float textSize) {
     this(Color.WHITE, Color.BLACK, textSize);
   }

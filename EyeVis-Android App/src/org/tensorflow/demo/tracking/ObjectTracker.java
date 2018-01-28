@@ -1,4 +1,3 @@
-
 package org.tensorflow.demo.tracking;
 
 import android.graphics.Canvas;
@@ -18,7 +17,6 @@ import javax.microedition.khronos.opengles.GL10;
 import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.env.Size;
 
-
 public class ObjectTracker {
   private static final Logger LOGGER = new Logger();
 
@@ -35,10 +33,8 @@ public class ObjectTracker {
 
   private static final boolean DRAW_TEXT = false;
 
- 
   private static final int MAX_DEBUG_HISTORY_SIZE = 30;
 
-  
   private static final int MAX_FRAME_HISTORY_SIZE = 200;
 
   private static final int DOWNSAMPLE_FACTOR = 2;
@@ -72,7 +68,7 @@ public class ObjectTracker {
     }
   }
 
-  
+
   public static class Keypoint {
     public final float x;
     public final float y;
@@ -162,9 +158,6 @@ public class ObjectTracker {
   public static synchronized ObjectTracker getInstance(
       final int frameWidth, final int frameHeight, final int rowStride, final boolean alwaysTrack) {
     if (!libraryFound) {
-      LOGGER.e(
-          "Native object tracking support not found. "
-              + "See tensorflow/examples/android/README.md for details.");
       return null;
     }
 
@@ -205,7 +198,6 @@ public class ObjectTracker {
   }
 
   protected void init() {
-    
     initNative(frameWidth / DOWNSAMPLE_FACTOR, frameHeight / DOWNSAMPLE_FACTOR, alwaysTrack);
   }
 
@@ -270,7 +262,6 @@ public class ObjectTracker {
     p.setColor(Color.RED);
     p.setStrokeWidth(2.0f);
 
-  
     p.setColor(Color.GREEN);
     canvas.drawCircle(startX, startY, 3.0f, p);
 
@@ -556,7 +547,6 @@ public class ObjectTracker {
   public synchronized TrackedObject trackObject(final RectF position, final byte[] frameData) {
     return new TrackedObject(position, lastTimestamp, frameData);
   }
-
   private long nativeObjectTracker;
 
   private native void initNative(int imageWidth, int imageHeight, boolean alwaysTrack);

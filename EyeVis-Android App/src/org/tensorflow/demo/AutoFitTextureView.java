@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
-
 public class AutoFitTextureView extends TextureView {
   private int ratioWidth = 0;
   private int ratioHeight = 0;

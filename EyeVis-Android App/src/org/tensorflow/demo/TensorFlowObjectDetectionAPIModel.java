@@ -1,3 +1,18 @@
+/* Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+
 package org.tensorflow.demo;
 
 import android.content.res.AssetManager;
@@ -18,15 +33,15 @@ import org.tensorflow.Operation;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.demo.env.Logger;
 
-
+/**
+ * Wrapper for frozen detection models trained using the Tensorflow Object Detection API:
+ * github.com/tensorflow/models/tree/master/research/object_detection
+ */
 public class TensorFlowObjectDetectionAPIModel implements Classifier {
   private static final Logger LOGGER = new Logger();
-
   private static final int MAX_RESULTS = 100;
-
   private String inputName;
   private int inputSize;
-
   private Vector<String> labels = new Vector<String>();
   private int[] intValues;
   private byte[] byteValues;
@@ -65,13 +80,11 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
     final Graph g = d.inferenceInterface.graph();
 
     d.inputName = "image_tensor";
-   
     final Operation inputOp = g.operation(d.inputName);
     if (inputOp == null) {
       throw new RuntimeException("Failed to find input Node '" + d.inputName + "'");
     }
     d.inputSize = inputSize;
-    
     final Operation outputOp1 = g.operation("detection_scores");
     if (outputOp1 == null) {
       throw new RuntimeException("Failed to find output Node 'detection_scores'");
@@ -84,6 +97,7 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
     if (outputOp3 == null) {
       throw new RuntimeException("Failed to find output Node 'detection_classes'");
     }
+
 
     d.outputNames = new String[] {"detection_boxes", "detection_scores",
                                   "detection_classes", "num_detections"};
@@ -100,11 +114,9 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
 
   @Override
   public List<Recognition> recognizeImage(final Bitmap bitmap) {
-    
     Trace.beginSection("recognizeImage");
 
     Trace.beginSection("preprocessBitmap");
-    
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
     for (int i = 0; i < intValues.length; ++i) {
@@ -112,12 +124,10 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
       byteValues[i * 3 + 1] = (byte) ((intValues[i] >> 8) & 0xFF);
       byteValues[i * 3 + 0] = (byte) ((intValues[i] >> 16) & 0xFF);
     }
-    Trace.endSection(); 
-
+    Trace.endSection();
     Trace.beginSection("feed");
     inferenceInterface.feed(inputName, byteValues, 1, inputSize, inputSize, 3);
     Trace.endSection();
-
     Trace.beginSection("run");
     inferenceInterface.run(outputNames, logStats);
     Trace.endSection();
@@ -139,7 +149,7 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
             new Comparator<Recognition>() {
               @Override
               public int compare(final Recognition lhs, final Recognition rhs) {
-                
+
                 return Float.compare(rhs.getConfidence(), lhs.getConfidence());
               }
             });
@@ -159,7 +169,7 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
     for (int i = 0; i < Math.min(pq.size(), MAX_RESULTS); ++i) {
       recognitions.add(pq.poll());
     }
-    Trace.endSection(); 
+    Trace.endSection();
     return recognitions;
   }
 

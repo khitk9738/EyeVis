@@ -7,6 +7,7 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FileOutputStream;
 
+
 public class ImageUtils {
   @SuppressWarnings("unused")
   private static final Logger LOGGER = new Logger();
@@ -19,19 +20,19 @@ public class ImageUtils {
     }
   }
 
- 
   public static int getYUVByteSize(final int width, final int height) {
-   
-    final int ySize = width * height;
+  final int ySize = width * height;
 
-    final int uvSize = ((width + 1) / 2) * ((height + 1) / 2) * 2;
+ final int uvSize = ((width + 1) / 2) * ((height + 1) / 2) * 2;
 
     return ySize + uvSize;
   }
 
+
   public static void saveBitmap(final Bitmap bitmap) {
     saveBitmap(bitmap, "preview.png");
   }
+
 
   public static void saveBitmap(final Bitmap bitmap, final String filename) {
     final String root =
@@ -57,12 +58,8 @@ public class ImageUtils {
       LOGGER.e(e, "Exception!");
     }
   }
-
-  
-  static final int kMaxChannelValue = 262143;
-
- 
-  private static boolean useNativeConversion = true;
+static final int kMaxChannelValue = 262143;
+private static boolean useNativeConversion = true;
 
   public static void convertYUV420SPToARGB8888(
       byte[] input,
@@ -80,8 +77,7 @@ public class ImageUtils {
       }
     }
 
-  
-    final int frameSize = width * height;
+final int frameSize = width * height;
     for (int j = 0, yp = 0; j < height; j++) {
       int uvp = frameSize + (j >> 1) * width;
       int u = 0;
@@ -100,19 +96,17 @@ public class ImageUtils {
   }
 
   private static int YUV2RGB(int y, int u, int v) {
-  
+    // Adjust and check YUV values
     y = (y - 16) < 0 ? 0 : (y - 16);
     u -= 128;
     v -= 128;
 
-   
-    int y1192 = 1192 * y;
+int y1192 = 1192 * y;
     int r = (y1192 + 1634 * v);
     int g = (y1192 - 833 * v - 400 * u);
     int b = (y1192 + 2066 * u);
 
-    
-    r = r > kMaxChannelValue ? kMaxChannelValue : (r < 0 ? 0 : r);
+  r = r > kMaxChannelValue ? kMaxChannelValue : (r < 0 ? 0 : r);
     g = g > kMaxChannelValue ? kMaxChannelValue : (g < 0 ? 0 : g);
     b = b > kMaxChannelValue ? kMaxChannelValue : (b < 0 ? 0 : b);
 
@@ -159,8 +153,10 @@ public class ImageUtils {
   }
 
 
+
   private static native void convertYUV420SPToARGB8888(
       byte[] input, int[] output, int width, int height, boolean halfSize);
+
 
   private static native void convertYUV420ToARGB8888(
       byte[] y,
@@ -174,19 +170,17 @@ public class ImageUtils {
       int uvPixelStride,
       boolean halfSize);
 
-  
   private static native void convertYUV420SPToRGB565(
       byte[] input, byte[] output, int width, int height);
 
- 
+
   private static native void convertARGB8888ToYUV420SP(
       int[] input, byte[] output, int width, int height);
 
-  
+
   private static native void convertRGB565ToYUV420SP(
       byte[] input, byte[] output, int width, int height);
 
-  
   public static Matrix getTransformationMatrix(
       final int srcWidth,
       final int srcHeight,
@@ -206,7 +200,6 @@ public class ImageUtils {
       matrix.postRotate(applyRotation);
     }
 
-   
     final boolean transpose = (Math.abs(applyRotation) + 90) % 180 == 0;
 
     final int inWidth = transpose ? srcHeight : srcWidth;
@@ -217,17 +210,14 @@ public class ImageUtils {
       final float scaleFactorY = dstHeight / (float) inHeight;
 
       if (maintainAspectRatio) {
-        
         final float scaleFactor = Math.max(scaleFactorX, scaleFactorY);
         matrix.postScale(scaleFactor, scaleFactor);
       } else {
-        
         matrix.postScale(scaleFactorX, scaleFactorY);
       }
     }
 
     if (applyRotation != 0) {
-      
       matrix.postTranslate(dstWidth / 2.0f, dstHeight / 2.0f);
     }
 
