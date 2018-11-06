@@ -1,5 +1,5 @@
 # EyeVis
-Project(Python/Android) based on Object detection using Google's Tensorsflow to provide vision to the blind, further implementing Optical Character Recognition ,Read It Aloud ,Google translations for different languages & Scene Recognition saving day-to-day problems of millions.
+Android based Vocal Vision for Visually Impaired. Object Detection using Tensorflow and YOLO, Voice Assistance using DialogFlow. Optical Character Reader, Read Aloud, voice triggers for GPS navigation, mails, messages, reminders, location, emergency contact,calls, journal, search engine etc. Face Recognition, Landmark Recognition, Image Labelling using Firebase ML Kit.
 
 ![alt tag](https://i.imgur.com/S2X1rUrh.png)
 
